@@ -22,6 +22,7 @@ This repository contains the code files for the carbonate clumped isotope calcul
 1. ~~Realize paper "Hemingway, J. D., and Henkes, G. A disordered kinetic model for clumped isotope bond reordering in carbonates, 2021, EPSL."~~
 2. ~~郭炀锐, 邓文峰, 韦刚健. 碳酸盐成岩作用中的团簇同位素地球化学研究进展. 2022, 矿物岩石地球化学通报.~~
 3. ~~The carbonate clumped isotope reordering calculation by Python (Exchange/diffusion model from Stolper et al., 2015| Paper "Stolper, D. A., Eiler, J. M., THE KINETICS OF SOLID-STATE ISOTOPE-EXCHANGE REACTIONS FOR CLUMPED ISOTOPES: A STUDY OF INORGANIC CALCITES AND APATITES FROM NATURAL AND EXPERIMENTAL SAMPLES. 2015．American Journal of Science. ").~~
+4. Added sevral examples for forward and backward reordering.
 
 ### Results
 
@@ -37,4 +38,5 @@ This repository contains the code files for the carbonate clumped isotope calcul
 
 ### To do
 
-1. Add Monte-Carlo simulation in defferent Δ47 input
+1. Add Monte-Carlo simulation in defferent Δ47 input (dobe)
+2. Add CLI intrerface
