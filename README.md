@@ -17,6 +17,7 @@ Core runtime (CLI):
 - Matplotlib
 - Pandas
 - isotopylog
+- Tkinter (usually bundled with Python on Windows)
 
 Optional (development / notebook):
 - Jupyter Notebook / JupyterLab
@@ -30,6 +31,8 @@ Optional (development / notebook):
 3. ~~The carbonate clumped isotope reordering calculation by Python (Exchange/diffusion model from Stolper et al., 2015 | "Stolper, D. A., Eiler, J. M., The kinetics of solid-state isotope-exchange reactions for clumped isotopes: A study of inorganic calcites and apatites from natural and experimental samples. 2015. American Journal of Science").~~
 4. ~~Added several examples for forward and backward reordering.~~
 5. ~~Added a CLI interface (`clump-history`) for running Δ47 forward models and thermal-history peak adjustments.~~
+6. ~~Packed the workflow into an .exe file.~~
+7. ~~Added a GUI interface (`clump-history-gui`) wrapping the same workflow.~~
 
 ### Quickstart (CLI)
 
@@ -44,9 +47,13 @@ You can then run either:
 
 ```bash
 clump-history --version
+clump-history run -h
+clump-history ufit -h
+
+clump-history-gui
 ```
 
-or
+You can also run via module:
 
 ```bash
 python -m clump_history --version
@@ -77,6 +84,21 @@ Output:
 
 > Note: If you run the CLI from a different directory, please pass explicit paths to `--thermal` / `--test`.
 
+### GUI Usage
+
+Start the GUI:
+
+```bash
+clump-history-gui
+```
+
+The GUI provides two tabs:
+
+- **Run (2×3 scenarios)**: selects Thermal/Test CSV, sets peak window/peak temps, and exports PDF/SVG.
+- **Ufit (peak adjust)**: applies constrained U-shaped peak adjustment and exports an adjusted CSV.
+
+---
+
 ### Input data format
 
 Thermal history CSV (example: `Thermal_History_Hu.csv`) must include:
@@ -90,6 +112,36 @@ Actual test CSV (example: `acutal_test_Hu.csv`) must include:
 - `SD`
 
 (You can change these column names using CLI flags such as `--time-col`, `--avg-col`, `--d47-col`, and `--sd-col`.)
+
+## PyInstaller (Windows packaging)
+
+### GUI (recommended, no console window)
+
+```bash
+pyinstaller run_gui.py ^
+  --name clump-history-gui ^
+  --noconfirm ^
+  --clean ^
+  --onedir ^
+  --windowed ^
+  --collect-all matplotlib ^
+  --collect-all isotopylog ^
+  --collect-submodules scipy
+```
+
+### CLI
+
+```bash
+pyinstaller run_cli.py ^
+  --name clump-history ^
+  --noconfirm ^
+  --clean ^
+  --onedir ^
+  --console ^
+  --collect-all matplotlib ^
+  --collect-all isotopylog ^
+  --collect-submodules scipy
+```
 
 ### Results
 

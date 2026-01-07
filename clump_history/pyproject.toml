@@ -20,6 +20,7 @@ dependencies = [
 
 [project.scripts]
 clump-history = "clump_history.cli:main"
+clump-history-gui = "clump_history.gui:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
