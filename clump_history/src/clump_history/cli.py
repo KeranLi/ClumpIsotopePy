@@ -99,7 +99,7 @@ def cmd_ufit(args: argparse.Namespace) -> None:
 
     T_new_k = constrained_u_fit(time_myr, T_avg_k, start_x, end_x, args.peak_temp + 273.15, plot=False)
 
-    # 输出一个带新列的CSV（单位还是 Celsius 更方便）
+    # 输出一个带新列的CSV（单位是 Celsius）
     out = pd.DataFrame({
         args.time_col: time_myr,
         args.avg_col: T_new_k - 273.15,
