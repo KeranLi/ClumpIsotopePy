@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: clump-history
+Version: 0.1.0
+Summary: Forward modeling clumped isotope Δ47 along thermal histories (isotopylog).
+Author: Keran Li
+License: MIT
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
