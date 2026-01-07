@@ -1,0 +1,14 @@
+{
+ "argv": [
+  "F:\\Anaconda3\\envs\\cycle\\python.exe",
+  "-m",
+  "ipykernel_launcher",
+  "-f",
+  "{connection_file}"
+ ],
+ "display_name": "PyCharm (cycle)",
+ "language": "python",
+ "metadata": {
+  "debugger": true
+ }
+}

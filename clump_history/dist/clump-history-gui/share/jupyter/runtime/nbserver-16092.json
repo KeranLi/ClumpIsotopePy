@@ -1,0 +1,12 @@
+{
+  "base_url": "/",
+  "hostname": "localhost",
+  "notebook_dir": "C:\\DeepTimeKB",
+  "password": false,
+  "pid": 16092,
+  "port": 8888,
+  "secure": false,
+  "sock": "",
+  "token": "94320340dc19c4addda0241621ddc84e6cbebc1365333bb9",
+  "url": "http://localhost:8888/"
+}
