@@ -1,0 +1,2 @@
+[console_scripts]
+clump-history = clump_history.cli:main

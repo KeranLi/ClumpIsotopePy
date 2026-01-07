@@ -7,6 +7,28 @@ from .io import load_thermal_history, load_test_data
 from .fit import constrained_u_fit
 from .model import compute_history
 from .plot import plot_grid
+from . import __version__
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]   # ...\clump_history
+WORKSPACE_ROOT = PROJECT_ROOT.parent                # ...\ClumpIsotope
+
+
+def resolve_input_path(p: Path) -> Path:
+    """Try absolute -> CWD-relative -> project-root-relative -> workspace-root-relative."""
+    p = Path(p)
+    if p.is_absolute():
+        return p
+    if p.exists():  # relative to current working dir
+        return p
+    alt1 = PROJECT_ROOT / p
+    if alt1.exists():
+        return alt1
+    alt2 = WORKSPACE_ROOT / p
+    if alt2.exists():
+        return alt2
+    return p
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -15,7 +37,18 @@ def build_parser() -> argparse.ArgumentParser:
         description="CLI for clumped isotope Δ47 forward modeling along thermal histories.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    sub = p.add_subparsers(dest="cmd", required=True)
+
+    # 顶层版本号
+    p.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
+    )
+
+    sub = p.add_subparsers(dest="cmd")
+    # Python 3.7 没有 subparsers(required=True) 的兼容问题时也可用；
+    # 但为了更友好，在 main() 里手动处理 cmd 为空的情况
+    # 保留 required=True
 
     # ---------- run ----------
     run = sub.add_parser("run", help="Run forward models for scenarios and plot a 2x3 grid.")
@@ -32,18 +65,35 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--d0-std", type=float, default=0.02)
 
     run.add_argument("--peak-window", type=float, nargs=2, default=[550, 600], metavar=("START", "END"))
-    run.add_argument("--peak-temps", type=float, nargs="+", default=[150, 200, 250, 300, 350],
-                     help="Peak temperatures in °C for scenarios (initial + these).")
+    run.add_argument(
+        "--peak-temps",
+        type=float,
+        nargs="+",
+        default=[150, 200, 250, 300, 350],
+        help="Peak temperatures in °C for scenarios (initial + these).",
+    )
     run.add_argument("--no-initial", action="store_true", help="Do not include initial (unmodified) scenario.")
 
     run.add_argument("--ylim", type=float, nargs=2, default=[0.15, 0.68], metavar=("YMIN", "YMAX"))
     run.add_argument("--tick-step", type=float, default=50, help="Right-axis temperature tick step (°C).")
 
-    run.add_argument("--out", type=Path, default=Path("output_figure_hu"),
-                     help="Output prefix (no extension). Generates .pdf and .svg.")
+    # ---------- add out-fir ----------
+    run.add_argument(
+    "--outdir",
+        type=Path,
+        default=Path("."),
+        help="Output directory (will be created if missing).",
+    )
+
+    run.add_argument(
+        "--out",
+        type=Path,
+        default=Path("output_figure_hu"),
+        help="Output prefix (no extension). Generates .pdf and .svg.",
+    )
     run.add_argument("--show", action="store_true", help="Show interactive window (otherwise just save).")
 
-    # ---------- ufit (可选：只做温度曲线U型约束并输出) ----------
+    # ---------- ufit ----------
     ufit = sub.add_parser("ufit", help="Apply constrained U-fit to a thermal history and export a new CSV.")
     ufit.add_argument("--thermal", type=Path, default=Path("./datasets/Thermal_History_Hu.csv"))
     ufit.add_argument("--time-col", type=str, default="Time/Myr")
@@ -52,13 +102,27 @@ def build_parser() -> argparse.ArgumentParser:
     ufit.add_argument("--peak-window", type=float, nargs=2, default=[550, 600], metavar=("START", "END"))
     ufit.add_argument("--peak-temp", type=float, required=True, help="Peak temperature (°C) for the U-fit.")
     ufit.add_argument("--out-csv", type=Path, default=Path("Thermal_History_adjusted.csv"))
+    ufit.add_argument("--outdir", type=Path, default=Path("."), help="Output directory (will be created if missing).")
 
     return p
 
 
 def cmd_run(args: argparse.Namespace) -> None:
-    time_myr, T_avg_k = load_thermal_history(args.thermal, args.time_col, args.avg_col)
-    delta47, delta47_err = load_test_data(args.test, args.d47_col, args.sd_col)
+
+    if not args.thermal.exists():
+        raise FileNotFoundError(
+            f"Thermal file not found: {args.thermal}\n"
+            f"Current working dir: {Path.cwd()}\n"
+            f"Tip: run from workspace root (where ./datasets exists) "
+            f"or pass --thermal with an absolute/relative path."
+        )
+
+
+    thermal_path = resolve_input_path(args.thermal)
+    test_path = resolve_input_path(args.test)
+
+    time_myr, T_avg_k = load_thermal_history(thermal_path, args.time_col, args.avg_col)
+    delta47, delta47_err = load_test_data(test_path, args.d47_col, args.sd_col)
 
     ed = ipl.EDistribution.from_literature(mineral=args.mineral, reference=args.reference)
 
@@ -77,13 +141,24 @@ def cmd_run(args: argparse.Namespace) -> None:
     # 只画前6个（2x3）
     scenarios = scenarios[:6]
 
+    # --------- output path handling ---------
+    out_prefix = args.out
+
+    # 如果用户给的 --out 没带目录（比如 fig_smoke），就放进 --outdir
+    # 如果用户给的 --out 自带目录（比如 results/fig），则优先尊重它
+    if out_prefix.parent == Path("."):
+        out_prefix = args.outdir / out_prefix
+
+    # 自动创建输出目录
+    out_prefix.parent.mkdir(parents=True, exist_ok=True)
+
     ymin, ymax = args.ylim
     plot_grid(
         time_myr=time_myr,
         scenarios=scenarios,
         delta47=delta47,
         delta47_err=delta47_err,
-        out_prefix=args.out,
+        out_prefix=out_prefix,   # contact path
         ymin=ymin,
         ymax=ymax,
         tick_step_c=args.tick_step,
@@ -94,23 +169,44 @@ def cmd_run(args: argparse.Namespace) -> None:
 def cmd_ufit(args: argparse.Namespace) -> None:
     import pandas as pd
 
-    time_myr, T_avg_k = load_thermal_history(args.thermal, args.time_col, args.avg_col)
+    if not args.thermal.exists():
+        raise FileNotFoundError(
+            f"Thermal file not found: {args.thermal}\n"
+            f"Current working dir: {Path.cwd()}\n"
+            f"Tip: run from workspace root (where ./datasets exists) "
+            f"or pass --thermal with an absolute/relative path."
+        )
+
+    thermal_path = resolve_input_path(args.thermal)
+    time_myr, T_avg_k = load_thermal_history(thermal_path, args.time_col, args.avg_col)
     start_x, end_x = args.peak_window
 
     T_new_k = constrained_u_fit(time_myr, T_avg_k, start_x, end_x, args.peak_temp + 273.15, plot=False)
 
-    # 输出一个带新列的CSV（单位还是 Celsius 更方便）
+    # 输出一个带新列的CSV（单位是 Celsius）
     out = pd.DataFrame({
         args.time_col: time_myr,
         args.avg_col: T_new_k - 273.15,
     })
-    out.to_csv(args.out_csv, index=False)
-    print(f"[OK] Saved adjusted thermal history: {args.out_csv}")
+
+    out_csv = args.out_csv
+    if out_csv.parent == Path("."):
+        out_csv = args.outdir / out_csv
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
+
+    out.to_csv(out_csv, index=False)
+    print(f"[OK] Saved adjusted thermal history: {out_csv}")
+
 
 
 def main():
     parser = build_parser()
     args = parser.parse_args()
+
+    # 未提供子命令时，显示帮助
+    if args.cmd is None:
+        parser.print_help()
+        raise SystemExit(2)
 
     if args.cmd == "run":
         cmd_run(args)
@@ -118,3 +214,4 @@ def main():
         cmd_ufit(args)
     else:
         raise SystemExit(f"Unknown command: {args.cmd}")
+

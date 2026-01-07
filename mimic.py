@@ -6,7 +6,7 @@
 # ------------------------------------------------------------------------------------ #
 
 from carbonate_reorder import carbonate_reorder_simulation_newton
-from visualization import plot_delta47, plot_temp_and_delta47
+from mimic_viz import plot_delta47, plot_temp_and_delta47
 
 # Like Liu et al., 2023 "碳酸盐岩团簇同位素约束下的川东地区二叠系热演化", "地质学报", if we can know the strata temprature varations
 old_time = list(range(275, 0, -5))
