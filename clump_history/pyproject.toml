@@ -4,12 +4,40 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clump-history"
-version = "0.1.0"
-description = "Forward modeling clumped isotope Δ47 along thermal histories (isotopylog)."
+version = "0.1.1"
+description = "Computational framework for carbonate clumped isotope (Δ47) forward/reordering calculations in geological samples"
 readme = "README.md"
 requires-python = ">=3.7"
 license = {text = "MIT"}
-authors = [{name = "Keran Li"}]
+authors = [
+    {name = "Keran Li", email = "keranli@smail.nju.edu.cn"},
+    {name = "Additional contributors listed in GitHub"}
+]
+maintainers = [
+    {name = "Keran Li", email = "keranli@smail.nju.edu.cn"}
+]
+keywords = [
+    "geochemistry",
+    "isotope geochemistry",
+    "carbonate",
+    "clumped isotopes",
+    "paleothermometry",
+    "geothermometry",
+    "diagenesis"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Operating System :: OS Independent"
+]
 dependencies = [
   "numpy",
   "pandas",
@@ -17,6 +45,25 @@ dependencies = [
   "scipy",
   "isotopylog",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "flake8",
+    "jupyter"
+]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme"
+]
+
+[project.urls]
+Homepage = "https://github.com/keran-li/ClumpIsotope"
+Repository = "https://github.com/keran-li/ClumpIsotope.git"
+Documentation = "https://github.com/keran-li/ClumpIsotope#readme"
+Changelog = "https://github.com/keran-li/ClumpIsotope/blob/main/clump_history/src/CHANGELOG.md"
 
 [project.scripts]
 clump-history = "clump_history.cli:main"

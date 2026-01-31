@@ -5,11 +5,22 @@ from PyInstaller.utils.hooks import collect_all
 datas = []
 binaries = []
 hiddenimports = []
+
+# Collect all submodules for the required packages
 hiddenimports += collect_submodules('scipy')
+hiddenimports += collect_submodules('numpy')
+hiddenimports += collect_submodules('pandas')
+hiddenimports += collect_submodules('matplotlib')
+hiddenimports += collect_submodules('isotopylog')
+
+# Collect all resources for matplotlib and isotopylog
 tmp_ret = collect_all('matplotlib')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('isotopylog')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+
+# Add clump_history package and its submodules
+hiddenimports += collect_submodules('clump_history')
 
 
 block_cipher = None
@@ -17,7 +28,7 @@ block_cipher = None
 
 a = Analysis(
     ['run_gui.py'],
-    pathex=[],
+    pathex=['clump_history'],  # Add the clump_history directory to pathex
     binaries=binaries,
     datas=datas,
     hiddenimports=hiddenimports,

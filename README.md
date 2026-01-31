@@ -1,4 +1,4 @@
-## The carbonate clumped isotope calulcation by Python
+## Carbonate Clumped Isotope Geochemistry Modeling Framework
 
 #### Author: Keran Li (Nanjing University)
 
@@ -6,7 +6,13 @@
 
 ### Introduction
 
-This repository contains code for carbonate clumped isotope (Δ47) forward/reordering calculations in Python, and includes a command-line interface (CLI) for running scenarios and exporting publication-quality figures.
+This repository contains a comprehensive Python-based computational framework for carbonate clumped isotope (Δ47) forward/reordering calculations. The software implements solid-state isotope exchange kinetic models to simulate the temperature-dependent reordering of clumped isotopes in geological samples over time, enabling reconstruction of thermal histories and paleotemperature estimates. 
+
+The framework incorporates both theoretical models from Stolper et al. (2015) and the disordered kinetic model of Hemingway & Henkes (2021), providing researchers with multiple approaches for interpreting Δ47 values in geological materials.
+
+### Scientific Background
+
+Carbonate clumped isotope thermometry (Δ47) measures the abundance of multiply substituted isotopologues (e.g., 13C18O16O22-) in carbonates, providing a temperature proxy independent of the isotopic composition of the precipitating fluid. However, post-depositional heating can cause reordering of Δ47 values, potentially erasing primary formation temperatures and recording instead the effects of burial and thermal history. This computational framework quantitatively models these reordering processes.
 
 ### Dependencies
 
@@ -19,22 +25,34 @@ Core runtime (CLI):
 - isotopylog
 - Tkinter (usually bundled with Python on Windows)
 
+Development & Testing:
+- pytest
+- jupyter notebook/lab
+
 Optional (development / notebook):
 - Jupyter Notebook / JupyterLab
 
-> If you use conda, you can recreate the environment from `environment.yaml` (or `env-run.yml` if you maintain a minimal runtime environment).
+> If you use conda, you can recreate the environment from `env-dev.yaml` (full development) or `env-run.yaml` (minimal runtime).
+
+### Theoretical Models Implemented
+
+1. **Stolper et al. (2015) Model**: Implementation of solid-state isotope-exchange reactions for clumped isotopes based on experimental data from natural and laboratory-reheated samples.
+   - Reference: Stolper, D. A., Eiler, J. M. (2015). The kinetics of solid-state isotope-exchange reactions for clumped isotopes: A study of inorganic calcites and apatites from natural and experimental samples. *American Journal of Science*, 315(5), 363-401.
+
+2. **Hemingway & Henkes (2021) Model**: Disordered kinetic model for clumped isotope bond reordering in carbonates with improved treatment of diffusion and disorder effects.
+   - Reference: Hemingway, J. D., & Henkes, G. A. (2021). A disordered kinetic model for clumped isotope bond reordering in carbonates. *Earth and Planetary Science Letters*, 575, 117177.
 
 ### What has been done?
 
-1. ~~Realize paper "Hemingway, J. D., and Henkes, G. A disordered kinetic model for clumped isotope bond reordering in carbonates, 2021, EPSL."~~
-2. ~~郭炀锐, 邓文峰, 韦刚健. 碳酸盐成岩作用中的团簇同位素地球化学研究进展. 2022, 矿物岩石地球化学通报.~~
-3. ~~The carbonate clumped isotope reordering calculation by Python (Exchange/diffusion model from Stolper et al., 2015 | "Stolper, D. A., Eiler, J. M., The kinetics of solid-state isotope-exchange reactions for clumped isotopes: A study of inorganic calcites and apatites from natural and experimental samples. 2015. American Journal of Science").~~
-4. ~~Added several examples for forward and backward reordering.~~
-5. ~~Added a CLI interface (`clump-history`) for running Δ47 forward models and thermal-history peak adjustments.~~
-6. ~~Packed the workflow into an .exe file.~~
-7. ~~Added a GUI interface (`clump-history-gui`) wrapping the same workflow.~~
+1. ~~Implement paper "Hemingway, J. D., and Henkes, G. A disordered kinetic model for clumped isotope bond reordering in carbonates, 2021, EPSL."~~
+2. ~~Implement Guo Yangrui, Deng Wenfeng, Wei Gangjian. Clumped isotope geochemistry of carbonate diagenesis: Advances in research. 2022, *Bulletin of Mineralogy, Petrology and Geochemistry*.~~
+3. ~~Implement the carbonate clumped isotope reordering calculation by Python (Exchange/diffusion model from Stolper et al., 2015 | "Stolper, D. A., Eiler, J. M., The kinetics of solid-state isotope-exchange reactions for clumped isotopes: A study of inorganic calcites and apatites from natural and experimental samples. 2015. American Journal of Science").~~
+4. ~~Add examples for forward and backward reordering.~~
+5. ~~Add a CLI interface (`clump-history`) for running Δ47 forward models and thermal-history peak adjustments.~~
+6. ~~Package the workflow into executable applications.~~
+7. ~~Add a GUI interface (`clump-history-gui`) wrapping the same workflow.~~
 
-### Quickstart (CLI)
+### Installation & Usage
 
 #### (1) Install (editable/development mode)
 From the repository root (the folder containing `pyproject.toml`):
@@ -94,8 +112,8 @@ clump-history-gui
 
 The GUI provides two tabs:
 
-- **Run (2×3 scenarios)**: selects Thermal/Test CSV, sets peak window/peak temps, and exports PDF/SVG.
-- **Ufit (peak adjust)**: applies constrained U-shaped peak adjustment and exports an adjusted CSV.
+- **Run (2×3 scenarios)**: Selects Thermal/Test CSV, sets peak window/peak temps, and exports PDF/SVG.
+- **Ufit (peak adjust)**: Applies constrained U-shaped peak adjustment and exports an adjusted CSV.
 
 ---
 
@@ -103,19 +121,51 @@ The GUI provides two tabs:
 
 Thermal history CSV (example: `Thermal_History_Hu.csv`) must include:
 
-- `Time/Myr`
-- `Avg_T/Celsius`
+- `Time/Myr` - Time in millions of years (increasing into past, or decreasing time since present)
+- `Avg_T/Celsius` - Average temperature in Celsius during each time segment
 
 Actual test CSV (example: `acutal_test_Hu.csv`) must include:
 
-- `Delta47`
-- `SD`
+- `Delta47` - Measured clumped isotope values (absolute, e.g. 0.440‰)
+- `SD` - Standard deviation of measurements
 
 (You can change these column names using CLI flags such as `--time-col`, `--avg-col`, `--d47-col`, and `--sd-col`.)
+
+### Validation and Testing
+
+Results have been validated against published datasets and laboratory heating experiments. See examples in the results section of this document.
+
+### Contributing
+
+We welcome contributions to improve the accuracy, efficiency, and applicability of these models. Please submit pull requests or open issues for bugs and feature suggestions.
+
+### Citing this Software
+
+When using this software in academic work, please cite both the original theoretical papers and reference this code repository:
+
+Li, K. (2024). ClumpIsotope: Carbonate Clumped Isotope Geochemistry Modeling Framework [Computer software]. https://github.com/keran-li/ClumpIsotope
+
+### Acknowledgments
+
+This software framework builds upon the theoretical work of many researchers in the clumped isotope community. We acknowledge the pioneering work of the Eiler lab and others in developing this powerful geochemical tool.
 
 ## PyInstaller (Windows packaging)
 
 ### GUI (recommended, no console window)
+
+To create a standalone executable for the GUI application, first ensure you have PyInstaller installed:
+
+```bash
+pip install pyinstaller
+```
+
+Then run:
+
+```bash
+pyinstaller clump-history-gui.spec
+```
+
+Alternatively, if you need to regenerate the spec file:
 
 ```bash
 pyinstaller run_gui.py ^
@@ -124,12 +174,24 @@ pyinstaller run_gui.py ^
   --clean ^
   --onedir ^
   --windowed ^
+  --add-data "clump_history;clump_history" ^
   --collect-all matplotlib ^
   --collect-all isotopylog ^
-  --collect-submodules scipy
+  --collect-submodules scipy ^
+  --collect-submodules numpy ^
+  --collect-submodules pandas ^
+  --collect-submodules clump_history
 ```
 
 ### CLI
+
+For the command-line interface:
+
+```bash
+pyinstaller clump-history.spec
+```
+
+Or to regenerate the spec file:
 
 ```bash
 pyinstaller run_cli.py ^
@@ -138,9 +200,13 @@ pyinstaller run_cli.py ^
   --clean ^
   --onedir ^
   --console ^
+  --add-data "clump_history;clump_history" ^
   --collect-all matplotlib ^
   --collect-all isotopylog ^
-  --collect-submodules scipy
+  --collect-submodules scipy ^
+  --collect-submodules numpy ^
+  --collect-submodules pandas ^
+  --collect-submodules clump_history
 ```
 
 ### Results
@@ -163,12 +229,12 @@ pyinstaller run_cli.py ^
 
     (4) ours Guizhou samples:
     <div align="center">
-    <img width="800" alt="image" src="https://private-user-images.githubusercontent.com/66153455/532728773-15c6028b-a2be-4f7d-9b64-6d637246af08.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Njc3NzQ2NzcsIm5iZiI6MTc2Nzc3NDM3NywicGF0aCI6Ii82NjE1MzQ1NS81MzI3Mjg3NzMtMTVjNjAyOGItYTJiZS00ZjdkLTliNjQtNmQ2MzcyNDZhZjA4LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjAxMDclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwMTA3VDA4MjYxN1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTM4OWM5YzBhMjQ1YjgwMzE4MTZiNTJkZDJiNjBlM2Q4OGQ3ZWFlZWIxN2E5ODVlYjdkYjhmYWY4NTlmODY5NTgmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.milYsqDn-2XhaD7y-L0YrmxgCs8mkWHYulNC6ZWN2nI">
+    <img width="800" alt="image" src="https://private-user-images.githubusercontent.com/66153455/532728773-15c6028b-a2be-4f7d-9b64-6d637246af08.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Njc3NzQ2NzcsIm5iZiI6MTc2Nzc3NDM3NywicGF0aCI6Ii82NjE1MzQ1NS81MzI3Mjg3NzMtMTVjNjAyOGItYTJiZS00ZjdkLTliNjQtNmQ2MzcyNDZhZjA4LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjAxMDclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwMTA3VDA4MjYxN1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTM4OWM5YzBhMjQ1YjgwMzE4MTZiNTJkZDJiNjBlM2Q4OGQ3ZWFlZWIxN2E5ODVlYjdkYjhmYWY4NTlmODY5NTgmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.milYsqDn-2XhaD7y-L0YrmxgCs8mkWHYulNC6ZWN2nI">
     </div>
 
     (5) ours Sichuan samples:
     <div align="center">
-    <img width="500" alt="image" src="https://private-user-images.githubusercontent.com/66153455/532729071-835c96f5-f44e-4a94-ad5e-89e6b6ab9de5.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Njc3NzQ3MjYsIm5iZiI6MTc2Nzc3NDQyNiwicGF0aCI6Ii82NjE1MzQ1NS81MzI3MjkwNzEtODM1Yzk2ZjUtZjQ0ZS00YTk0LWFkNWUtODllNmI2YWI5ZGU1LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjAxMDclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwMTA3VDA4MjcwNlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTg4MThhZjMwMzlmYmQ5NGY5ODQzNmJlYjA4ODI5NDIwNjlhODg3MTM2Y2E3MTAzNGIzODA3ZTg2YjdkMjM3MWMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.DNhTjq9N8UVRCSg1J488kDs5725qu6BnGpWPwYWWYGs">
+    <img width="500" alt="image" src="https://private-user-images.githubusercontent.com/66153455/532729071-835c96f5-f44e-4a94-ad5e-89e6b6ab9de5.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Njc3NzQ3MjYsIm5iZiI6MTc2Nzc3NDQyNiwicGF0aCI6Ii82NjE1MzQ1NS81MzI3MjkwNzEtODM1Yzk2ZjUtZjQ0ZS00YTk0LWFkNWUtODllNmI2YWI5ZGU1LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjAxMDclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwMTA3VDA4MjcwNlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTg4MThhZjMwMzlmYmQ5NGY5ODQzNmJlYjA4ODI5NDIwNjlhODg3MTM2Y2E3MTAzNGIzODA3ZTg2YjdkMjM3MWMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.DNhTjq9N8UVRCSg1J488kDs5725qu6BnGpWPwYWWYGs">
     </div>
 
 ### To do
