@@ -1,34 +1,38 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import collect_submodules, collect_data_files
 from PyInstaller.utils.hooks import collect_all
+import os
 
 datas = []
 binaries = []
 hiddenimports = []
 
-# Collect all submodules for the required packages
+# Collect all necessary submodules
 hiddenimports += collect_submodules('scipy')
 hiddenimports += collect_submodules('numpy')
 hiddenimports += collect_submodules('pandas')
 hiddenimports += collect_submodules('matplotlib')
 hiddenimports += collect_submodules('isotopylog')
 
-# Collect all resources for matplotlib and isotopylog
+# Collect all necessary data files
+datas += collect_data_files('matplotlib')
+datas += collect_data_files('isotopylog')
+
+# Process matplotlib and isotopylog specifically
 tmp_ret = collect_all('matplotlib')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('isotopylog')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
-# Add clump_history package and its submodules
-hiddenimports += collect_submodules('clump_history')
-
+# Add clump_history package data
+hiddenimports += collect_submodules('clump_history.src.clump_history')
 
 block_cipher = None
 
 
 a = Analysis(
     ['run_cli.py'],
-    pathex=['clump_history'],  # Add the clump_history directory to pathex
+    pathex=['../src'],
     binaries=binaries,
     datas=datas,
     hiddenimports=hiddenimports,
@@ -41,6 +45,7 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
+
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
@@ -53,13 +58,15 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,  # CLI version should have console
+    console=True,  # Console app for CLI
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=None
 )
+
 coll = COLLECT(
     exe,
     a.binaries,

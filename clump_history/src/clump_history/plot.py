@@ -92,3 +92,5 @@ def plot_grid(time_myr, scenarios, delta47, delta47_err, out_prefix, ymin, ymax,
 
     print(f"[OK] Saved: {svg_path}")
     print(f"[OK] Saved: {pdf_path}")
+
+__all__ = ["plot_results", "other_functions"]  # 确保 plot_results 被导出

@@ -1,0 +1,12 @@
+{
+  "base_url": "/",
+  "hostname": "localhost",
+  "notebook_dir": "C:\\STWR-master",
+  "password": false,
+  "pid": 25016,
+  "port": 8888,
+  "secure": false,
+  "sock": "",
+  "token": "13f9ab5d37e67e855e9400d3cf0d4b30bcd6d95ae8a0d613",
+  "url": "http://localhost:8888/"
+}
