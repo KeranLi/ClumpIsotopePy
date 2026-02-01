@@ -1,7 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
+# Single-file executable configuration
+# Use this for simpler distribution (one .exe file)
+
 from PyInstaller.utils.hooks import collect_submodules, collect_data_files
 from PyInstaller.utils.hooks import collect_all
-import os
 
 datas = []
 binaries = []
@@ -13,18 +15,15 @@ hiddenimports += collect_submodules('numpy')
 hiddenimports += collect_submodules('pandas')
 hiddenimports += collect_submodules('matplotlib')
 hiddenimports += collect_submodules('isotopylog')
-
-# 添加matplotlib后端支持
 hiddenimports += [
     'matplotlib.backends.backend_tkagg',
     'matplotlib.backends.backend_agg',
 ]
 
-# Collect all necessary data files
+# Collect data files
 datas += collect_data_files('matplotlib')
 datas += collect_data_files('isotopylog')
 
-# Process matplotlib and isotopylog specifically
 tmp_ret = collect_all('matplotlib')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('isotopylog')
@@ -61,6 +60,8 @@ a = Analysis(
         'unittest',
         'pytest',
         '_pytest',
+        'pylint',
+        'mypy',
     ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
@@ -70,32 +71,26 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+# Single-file executable (onefile mode)
 exe = EXE(
     pyz,
     a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
     [],
-    exclude_binaries=True,
-    name='clump-history-gui',
+    name='ClumpHistoryGUI',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=False,  # GUI模式，不显示控制台
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None  # 可以添加图标：'assets/icon.ico'
-)
-
-coll = COLLECT(
-    exe,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    name='clump-history-gui',
+    icon=None,
 )

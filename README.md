@@ -110,10 +110,35 @@ Start the GUI:
 clump-history-gui
 ```
 
-The GUI provides two tabs:
+Or from the project root:
 
-- **Run (2×3 scenarios)**: Selects Thermal/Test CSV, sets peak window/peak temps, and exports PDF/SVG.
-- **Ufit (peak adjust)**: Applies constrained U-shaped peak adjustment and exports an adjusted CSV.
+```bash
+cd clump_history
+python run_gui.py
+```
+
+The GUI provides an intuitive interface for running forward modeling scenarios:
+
+**Main Features:**
+
+1. **数据文件选择** - 选择热历史CSV和实测Δ47数据CSV文件
+2. **CSV列名设置** - 配置时间、温度、Δ47和误差列的名称
+3. **模型参数** - 选择矿物类型(calcite/dolomite)和参考文献
+4. **潜在热历史设置** - 
+   - 设置U-Fit时间窗口 (开始-结束 Myr)
+   - 输入多个峰值温度进行批量测试 (空格分隔，如: `150 200 250 300 350`)
+5. **绘图设置** - 调整Y轴范围、温度刻度步长
+6. **输出设置** - 指定输出目录和文件前缀
+
+**工作流程：**
+
+1. 选择热历史CSV文件 (包含Time/Myr和Avg_T/Celsius列)
+2. 选择实测数据CSV文件 (包含Delta47和SD列)
+3. 设置潜在热历史的时间窗口和要测试的峰值温度
+4. 点击"运行分析"
+5. 查看输出目录中的PDF/SVG图表
+
+详细使用说明请参考: [GUI_USAGE.md](clump_history/GUI_USAGE.md)
 
 ---
 
@@ -149,24 +174,28 @@ Li, K. (2024). ClumpIsotope: Carbonate Clumped Isotope Geochemistry Modeling Fra
 
 This software framework builds upon the theoretical work of many researchers in the clumped isotope community. We acknowledge the pioneering work of the Eiler lab and others in developing this powerful geochemical tool.
 
-## PyInstaller (Windows packaging)
+## Packaging Applications
 
-### GUI (recommended, no console window)
+To create standalone executables for distribution:
 
-To create a standalone executable for the GUI application, first ensure you have PyInstaller installed:
-
+### Automatic Build (Recommended)
+Use the provided build script:
 ```bash
-pip install pyinstaller
+# On Windows
+build_apps.bat
 ```
 
-Then run:
+This will create both CLI and GUI executables in the `clump_history/dist/` directory.
 
+### Manual Build with PyInstaller
+
+#### GUI (recommended, no console window)
 ```bash
+cd clump_history/
 pyinstaller clump-history-gui.spec
 ```
 
-Alternatively, if you need to regenerate the spec file:
-
+Or using direct command:
 ```bash
 pyinstaller run_gui.py ^
   --name clump-history-gui ^
@@ -174,25 +203,20 @@ pyinstaller run_gui.py ^
   --clean ^
   --onedir ^
   --windowed ^
-  --add-data "clump_history;clump_history" ^
   --collect-all matplotlib ^
   --collect-all isotopylog ^
   --collect-submodules scipy ^
   --collect-submodules numpy ^
-  --collect-submodules pandas ^
-  --collect-submodules clump_history
+  --collect-submodules pandas
 ```
 
-### CLI
-
-For the command-line interface:
-
+#### CLI
 ```bash
+cd clump_history/
 pyinstaller clump-history.spec
 ```
 
-Or to regenerate the spec file:
-
+Or using direct command:
 ```bash
 pyinstaller run_cli.py ^
   --name clump-history ^
@@ -200,14 +224,16 @@ pyinstaller run_cli.py ^
   --clean ^
   --onedir ^
   --console ^
-  --add-data "clump_history;clump_history" ^
   --collect-all matplotlib ^
   --collect-all isotopylog ^
   --collect-submodules scipy ^
   --collect-submodules numpy ^
-  --collect-submodules pandas ^
-  --collect-submodules clump_history
+  --collect-submodules pandas
 ```
+
+Executables will be created in the `dist/` directory:
+- `clump-history-gui/clump-history-gui.exe` - Graphical user interface
+- `clump-history/clump-history.exe` - Command-line interface
 
 ### Results
 

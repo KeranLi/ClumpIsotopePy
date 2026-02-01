@@ -1,21 +1,32 @@
 @echo off
-echo Building ClumpIsotope applications...
+REM ClumpIsotope Application Build Script
+REM This script rebuilds both CLI and GUI applications using PyInstaller
 
-REM 设置环境变量
-set PYTHONPATH=%~dp0clump_history\src;%PYTHONPATH%
+echo Starting ClumpIsotope application build process...
 
-REM 检查是否安装了pyinstaller
-python -c "import PyInstaller" 2>nul
-if errorlevel 1 (
-    echo Installing PyInstaller...
-    pip install pyinstaller
+REM Change to the clump_history directory
+cd /d "%~dp0\clump_history"
+
+echo Building GUI application...
+pyinstaller clump-history-gui.spec --noconfirm --clean
+if %ERRORLEVEL% NEQ 0 (
+    echo Error building GUI application
+    pause
+    exit /b %ERRORLEVEL%
 )
 
 echo Building CLI application...
-pyinstaller clump-history.spec || echo Error building CLI application
+pyinstaller clump-history.spec --noconfirm --clean
+if %ERRORLEVEL% NEQ 0 (
+    echo Error building CLI application
+    pause
+    exit /b %ERRORLEVEL%
+)
 
-echo Building GUI application...
-pyinstaller clump-history-gui.spec || echo Error building GUI application
-
-echo Build process completed. Check the dist/ folder for executables.
-pause
+echo Build process completed successfully!
+echo.
+echo GUI application located at: dist\clump-history-gui\clump-history-gui.exe
+echo CLI application located at: dist\clump-history\clump-history.exe
+echo.
+echo Press any key to exit...
+pause > nul

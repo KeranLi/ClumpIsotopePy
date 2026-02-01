@@ -47,7 +47,7 @@ def plot_grid(time_myr, scenarios, delta47, delta47_err, out_prefix, ymin, ymax,
             np.zeros_like(delta47),
             delta47, yerr=delta47_err,
             fmt='o',
-            label='Actual $\Delta$47',
+            label=r'Actual $\Delta$47',
             color='black',
             capsize=4,
             alpha=0.6,
@@ -59,7 +59,7 @@ def plot_grid(time_myr, scenarios, delta47, delta47_err, out_prefix, ymin, ymax,
         if i >= 3:
             ax.set_xlabel('Age (Myr)')
         if i % 3 == 0:
-            ax.set_ylabel('$\Delta$47 (‰)')
+            ax.set_ylabel(r'$\Delta$47 (‰)')
 
         secax = ax.secondary_yaxis('right')
         secax.set_yticks(d47_ticks)
@@ -93,4 +93,39 @@ def plot_grid(time_myr, scenarios, delta47, delta47_err, out_prefix, ymin, ymax,
     print(f"[OK] Saved: {svg_path}")
     print(f"[OK] Saved: {pdf_path}")
 
-__all__ = ["plot_results", "other_functions"]  # 确保 plot_results 被导出
+def plot_results(results, outdir, out_prefix, show_plots=False, ymin=0.15, ymax=0.68, tick_step=50):
+    """
+    Plot forward modeling results and save to files.
+    
+    Parameters
+    ----------
+    results : dict
+        Dictionary containing 'time_myr', 'scenarios', 'delta47', 'delta47_err'
+    outdir : str or Path
+        Output directory path
+    out_prefix : str
+        Prefix for output filenames
+    show_plots : bool, optional
+        Whether to display plots interactively
+    ymin, ymax : float
+        Y-axis limits for Delta47
+    tick_step : float
+        Temperature tick step in Celsius
+    """
+    from pathlib import Path
+    
+    out_path = Path(outdir) / out_prefix
+    plot_grid(
+        results['time_myr'], 
+        results['scenarios'], 
+        results['delta47'], 
+        results['delta47_err'],
+        out_path, 
+        ymin, 
+        ymax, 
+        tick_step, 
+        show=show_plots
+    )
+
+
+__all__ = ["plot_results", "plot_grid", "build_secondary_ticks"]

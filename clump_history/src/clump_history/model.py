@@ -6,7 +6,11 @@ of clumped isotopes in geological samples over time. The models simulate how
 carbonate clumped isotope compositions (Δ47) change due to solid-state isotope 
 exchange reactions during burial and thermal maturation.
 
-The implementation is based on:
+The framework incorporates both theoretical models from Stolper et al. (2015) and 
+the disordered kinetic model of Hemingway & Henkes (2021), providing researchers 
+with multiple approaches for interpreting Δ47 values in geological materials.
+
+Implementation is based on:
 1. Stolper, D. A., Eiler, J. M. (2015). The kinetics of solid-state 
    isotope-exchange reactions for clumped isotopes: A study of inorganic 
    calcites and apatites from natural and experimental samples. 
@@ -45,9 +49,8 @@ def compute_history(time_myr, T_k, ed, d0_std):
     T_k : array-like
         Temperature values in Kelvin corresponding to each time segment. 
         Should match the time points in `time_myr`.
-    ed : float
-        Activation energy parameter for the isotope exchange reaction [kJ/mol].
-        This represents the energy barrier for solid-state reordering.
+    ed : isotopylog.EDistribution
+        The EDistribution object containing activation energy parameters.
     d0_std : float
         Initial standard deviation of the clumped isotope signal, representing 
         the initial state of the sample before significant reordering occurred.
@@ -73,6 +76,15 @@ def compute_history(time_myr, T_k, ed, d0_std):
     with higher temperatures causing more rapid equilibration toward the 
     temperature-dependent equilibrium Δ47 value.
     
+    Compatibility Note
+    ------------------
+    This function requires isotopylog 0.0.8 with NumPy 1.x (1.23 recommended).
+    If you encounter "ValueError: setting an array element with a sequence",
+    please install the compatible environment:
+    
+        conda env create -f create_env.yaml
+        conda activate clump-isotope
+    
     References
     ----------
     .. [1] Stolper, D. A., & Eiler, J. M. (2015). American Journal of Science, 315(5), 363-401.
@@ -94,11 +106,23 @@ def compute_history(time_myr, T_k, ed, d0_std):
     # Calculate the initial equilibrium Δ47 value from the first temperature
     D0 = ipl.Deq_from_T(T_rev[0])
     # Initialize the starting conditions [Δ47 value, d47/dt, other params]
-    d0 = [D0, 0, 0]
+    # Convert numpy scalar to Python float for compatibility
+    if hasattr(D0, 'item'):
+        D0 = D0.item()
+    d0 = [D0, 0.0, 0.0]
 
     # Perform the geologic history integration using isotopylog
     # This computes how Δ47 evolves over the thermal history
-    D_rev, Dstd_rev = ipl.geologic_history(t_sec, T_rev, ed, d0, d0_std=[d0_std])
+    try:
+        D_rev, Dstd_rev = ipl.geologic_history(t_sec, T_rev, ed, d0, d0_std=[d0_std])
+    except ValueError as e:
+        if "setting an array element with a sequence" in str(e):
+            raise RuntimeError(
+                "isotopylog compatibility error with NumPy 2.x. "
+                "Please use NumPy 1.x (e.g., 1.23). "
+                "Run: conda env create -f create_env.yaml && conda activate clump-isotope"
+            ) from e
+        raise
 
     # Reverse the results back to the original time direction (past to present)
     D = D_rev[::-1]

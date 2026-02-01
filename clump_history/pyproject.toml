@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clump-history"
-version = "0.1.1"
+version = "0.2.0"
 description = "Computational framework for carbonate clumped isotope (Δ47) forward/reordering calculations in geological samples"
-readme = "README.md"
-requires-python = ">=3.7"
+readme = "../README.md"
+requires-python = ">=3.7,<3.13"
 license = {text = "MIT"}
 authors = [
     {name = "Keran Li", email = "keranli@smail.nju.edu.cn"},
@@ -23,7 +23,9 @@ keywords = [
     "clumped isotopes",
     "paleothermometry",
     "geothermometry",
-    "diagenesis"
+    "diagenesis",
+    "thermal history",
+    "forward modeling"
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -33,17 +35,20 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
     "Topic :: Scientific/Engineering :: Chemistry",
     "Topic :: Scientific/Engineering :: GIS",
-    "Operating System :: OS Independent"
+    "Operating System :: OS Independent",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux"
 ]
 dependencies = [
-  "numpy",
-  "pandas",
-  "matplotlib",
-  "scipy",
-  "isotopylog",
+    "numpy<2.0",  # isotopylog 0.0.8 requires NumPy 1.x
+    "pandas",
+    "matplotlib",
+    "scipy",
+    "isotopylog",
 ]
 
 [project.optional-dependencies]
@@ -52,7 +57,11 @@ dev = [
     "pytest-cov",
     "black",
     "flake8",
-    "jupyter"
+    "jupyter",
+    "pyinstaller"
+]
+build = [
+    "pyinstaller>=5.0"
 ]
 docs = [
     "sphinx",
@@ -64,6 +73,7 @@ Homepage = "https://github.com/keran-li/ClumpIsotope"
 Repository = "https://github.com/keran-li/ClumpIsotope.git"
 Documentation = "https://github.com/keran-li/ClumpIsotope#readme"
 Changelog = "https://github.com/keran-li/ClumpIsotope/blob/main/clump_history/src/CHANGELOG.md"
+Issues = "https://github.com/keran-li/ClumpIsotope/issues"
 
 [project.scripts]
 clump-history = "clump_history.cli:main"
@@ -74,3 +84,8 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pyinstaller]
+# PyInstaller specific options
+onefile = false
+console = false
